@@ -1,0 +1,147 @@
+﻿@model VShuttle.Model.ViewModel.RouteUserinfo
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div id="registerUser" class="row-fluid">
+
+      <div class="col-md-12 error-msg">
+          * Please register your today's location !!
+      </div>
+  
+       @using (Html.BeginForm("Index","Home", FormMethod.Post))
+       {
+        <span class="form-element col-md-3">           
+            @Html.TextBoxFor(m => m.UserInfo.Name, new { placeholder = "Enter Name" })
+        </span>
+        <span class="form-element col-md-3">
+           @Html.DropDownListFor(m=>m.UserInfo.Location, ViewData["location"] as List<SelectListItem>) 
+        </span>
+        <span class="form-element col-md-3">          
+            @Html.TextBoxFor(m => m.UserInfo.SubLocation, new { placeholder = "Enter Sub-location" })
+        </span>
+        <span class="form-element col-md-3 pull-right">
+            <button class="btn btn-primary" type="submit">Save</button>
+        </span>
+       }
+   
+</div>
+
+<div id="report" class="row-fluid">
+    
+        <div class="col-md-9">
+            <table class="table table-bordered table-responsive table-striped" id="UserInfoList">
+                <thead>
+                    <tr>
+                        <th><a class="table-header" field-name="Id">Id</a></th>
+                        <th><a class="table-header" field-name="Name">Name</a></th>
+                        <th><a class="table-header" field-name="Location">Location</a></th>
+                        <th><a class="table-header" field-name="SubLocation">SubLocation</a></th>
+                        <th><a class="table-header" field-name="Date">Date</a></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    <div class="col-md-3">
+        <table class="table table-bordered table-responsive table-striped" id="UserInfoTotal">
+            <thead>
+                <tr>
+                    <th><a class="table-header" field-name="Location">Location</a></th>
+                    <th><a class="table-header" field-name="TotalCount">Total</a></th>                   
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <hr>
+
+    <div class="col-md-12 route-info">
+       Route Information
+    </div>
+
+    @{ int i = -1; var routearray = new string[] { "One", "Two", "Three", "Four", "Five","Six","Seven" }; }
+    @foreach (var route in Model.Routes)
+    {
+        i++;
+        var routes = @route.RouteLocations.Replace(",", " -> ");
+        <div class="col-md-3 route">
+            <div>
+                <span class="route-header">Route @routearray[i]</span>
+                <span class="route-body">@routes</span>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+<script>
+
+    $(function () {
+
+
+
+        $('#UserInfoList').ajaxGrid({
+            pageSize: 2,
+            defaultSortExpression: 'Id',
+            defaultSortOrder: 'DESC',
+            tableHeading: '.table-header',
+            url: '@Url.Action("FindAll","Home")',
+            requestType: 'get',
+            loadingImage: $('#loading-msg-subscribers-management'),
+            NoRecordsFound: 'No Records Found',
+            postContent: [
+                {
+                    control: $('<button type="button" class="btn btn-primary" ' +
+                    'onclick=\'showEditForm(this,"Edit", "@Url.Action("Form","Home")",300,300)\'>' +
+                    '<small class="glyphicon glyphicon-edit"></small></small>' +
+                    '</button>')
+                },
+                {
+                    control: $('<form action="@Url.Action("Delete","Home")" method="POST" style="display:inline-block">' +
+                    '<input type="hidden" name="Id" id="Id"/>' +
+                    '<button type="submit" class="btn btn-danger" ' +
+                    'onclick=\'return confirm("Are you sure you want to Remove this List?")\'>' +
+                    '<span class="glyphicon glyphicon-remove"></span></button></form>'),
+                    properties: [
+                        {
+                            propertyField: 'input[type=hidden]#Id',
+                            property: 'value',
+                            propertyValue: 'Id'
+                        }
+                    ]
+                }
+            ],
+            afterAjaxCallComplete: function () {
+                //$("#UserInfoList .btn").prop("disabled", true);
+            },
+            id: 'Id'
+        });
+    });
+
+    $('#UserInfoTotal').ajaxGrid({
+        pageSize: 2,
+        defaultSortExpression: 'Id',
+        defaultSortOrder: 'DESC',
+        tableHeading: '.table-header',
+        url: '@Url.Action("FindAllTotal","Home")',
+        requestType: 'get',
+        loadingImage: $('#loading-msg-subscribers-management'),
+        NoRecordsFound: 'No Records Found'
+    });
+
+    $("#UserInfo_Name").val("@Session["UserName"]");
+    //alert("@Session["UserName"]");
+
+
+</script>
+
+
+
+

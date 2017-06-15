@@ -1,0 +1,35 @@
+﻿@model VShuttle.Models.Users
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string buttontext = ViewBag.register == 1 ? "Register" : "Login";
+}
+
+<div class="login-page">
+    <div class="form">
+   
+        @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { @class = "login-form" }))
+        {
+           <div class="error-msg">@ViewData["error"]</div>
+            if (ViewBag.register == 1)
+            {
+                @Html.TextBoxFor(m => m.UserId, new { placeholder = "UserId" })
+            }
+           @Html.TextBoxFor(m => m.UserName, new { placeholder = "username" })
+           @Html.TextBoxFor(m => m.Password, new { placeholder = "password" })        
+
+           <button type="submit">@buttontext</button>
+            if (ViewBag.register == 1)
+            {
+              <p class="message"> Already registered? <a href="@Url.Action("Index", "Login")"> Login </a></p>    
+            }
+            else
+            {
+              <p class="message"> Not registered? <a href="@Url.Action("Register", "Login")"> Register </a></p>
+            }
+
+        }
+
+    </div>
+</div>
+
