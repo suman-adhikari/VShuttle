@@ -1,5 +1,6 @@
 
 (function ($) {
+
     $.fn.ajaxGrid = function (options) {
 
         return this.each(function () {
@@ -40,6 +41,7 @@
                     self.createTable(currentOffset, options.pageSize, options.defaultSortExpression, options.defaultSortOrder, currentPage);
 
                     $table.on("refreshGrid", function (event, jsonParameters) {
+                        
                         if (options.filterData != null)
                             options.filterData = self.concatJson(options.filterData, jsonParameters);
                         else
@@ -157,10 +159,9 @@
                             if (options.afterAjaxCallAllTime != null) {
                                 options.afterAjaxCallAllTime();
                             }
-
                         },
                         success: function (data) {
-                             debugger;
+                            
                             if (options.getAjaxResultData != null && options.getAjaxResultData.toSetVariableName != null) {
                                 var variableName = options.getAjaxResultData.toSetVariableName;
 
@@ -203,7 +204,7 @@
                 },
 
                 createTable: function (offset, pageSize, sortExpression, sortOrder, pageNumber) {
-
+                  
                     if (options.hideControlDuringTableCreation != null)
                         options.hideControlDuringTableCreation.css("visibility", "hidden");
 

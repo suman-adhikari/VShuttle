@@ -4,6 +4,11 @@ using VShuttle.Model;
 using VShuttle.Model.ViewModel;
 using VShuttle.Models;
 using VShuttle.Repository;
+using Excel = Microsoft.Office.Interop.Excel;
+using System.Data;
+using System.Drawing;
+using System;
+using System.Runtime.InteropServices;
 
 namespace VShuttle.Controllers
 {
@@ -45,19 +50,20 @@ namespace VShuttle.Controllers
             return View(); 
         }
 
-        public ActionResult FindAll(AjaxModel ajaxGrid)
+        public ActionResult FindAll(int offset, int rowNumber, string sortExpression, string sortOrder, int pageNumber, string Name="")
         {
             List<UserInfo> userInfo = new List<UserInfo>() {
-                new UserInfo{ Id=1, Name="Abc", Location="Loc",   SubLocation="subloc", Date="2017/06/12"},
-                new UserInfo{ Id=2, Name="Abc1", Location="Loc1", SubLocation="subloc1", Date="2017/06/12"},
-                new UserInfo{ Id=3, Name="Abc2", Location="Loc2", SubLocation="subloc2", Date="2017/06/12"},
-                new UserInfo{ Id=4, Name="Abc3", Location="Loc3", SubLocation="subloc3", Date="2017/06/12"}
+                new UserInfo{ Id=1, UserId=1, Name="Abc", Location="Loc",   SubLocation="subloc", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc1", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=3, UserId=3, Name="Abc2", Location="Loc2", SubLocation="subloc2", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc3", SubLocation="subloc3", Date="2017/06/12"}
             };
+
 
             AjaxGridResult result = new AjaxGridResult();
             result.Data = userInfo;
-            result.pageNumber = ajaxGrid.pageNumber;
-            result.RowCount = ajaxGrid.rowNumber;
+            result.pageNumber = pageNumber;
+            result.RowCount = rowNumber;
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -107,6 +113,110 @@ namespace VShuttle.Controllers
             result.RowCount = ajaxGrid.rowNumber;
 
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportToExcel()
+        {
+            
+            Excel.Application excelApp = new Excel.Application();
+            Excel.Workbook excelWorkBook;
+            Excel.Worksheet excelWorkSheet;
+            object misValue = System.Reflection.Missing.Value;
+            excelWorkBook = excelApp.Workbooks.Add(misValue);
+            Excel.Range range;
+
+            string location = DateTime.Now.ToLongTimeString().Replace(":", "").Replace(" ", "") + ".xlsx";
+            excelWorkBook.SaveAs(@"E:\"+location+"");
+
+            Excel.Style headerStyle = excelWorkBook.Styles.Add("NewStyle");
+            headerStyle.Font.Size = 10;
+            excelWorkBook.InactiveListBorderVisible = true;
+            headerStyle.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            headerStyle.Font.Color = ColorTranslator.ToOle(Color.White);
+            headerStyle.Interior.Color =ColorTranslator.ToOle(Color.Gray);
+            headerStyle.Interior.Pattern = Excel.XlPattern.xlPatternSolid;
+
+            excelWorkSheet = excelWorkBook.Sheets.Add();
+            range = excelWorkSheet.get_Range("A1", "G1");
+            range.Style = "NewStyle";
+            range.Columns.AutoFit();
+
+            range.EntireColumn.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            range.EntireColumn.VerticalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+            for (int i = 3; i <= 6; i++)
+            {
+                excelWorkSheet.Columns[i].ColumnWidth = 15;             
+            }
+           
+            var ds = userInfoRepository.GetData();
+            string previousValue = "";
+
+            foreach (DataTable table in ds.Tables)
+            {              
+
+                for (int i = 1; i < table.Columns.Count + 1; i++)
+                {
+                      excelWorkSheet.Cells[1, i] = table.Columns[i - 1].ColumnName;
+                }
+                
+                int count = 1;
+                
+                for (int j = 0; j < table.Rows.Count; j++)
+                {                 
+                    for (int k = 0; k < table.Columns.Count; k++)
+                    {        
+                        string newValue = table.Rows[j].ItemArray[k].ToString();                      
+                         if (k+1==4)
+
+                        {                         
+                            if(newValue == previousValue){
+                                count++;                             
+                                Excel.Range r = excelWorkSheet.Range[excelWorkSheet.Cells[j + 2 - 1, k + 1], excelWorkSheet.Cells[j + 2, k + 1]];
+                                Excel.Range total = excelWorkSheet.Range[excelWorkSheet.Cells[j + 2 - 1, k + 2], excelWorkSheet.Cells[j + 2, k + 2]];
+                                r.Merge(Type.Missing);
+                                total.Merge(Type.Missing);
+                                total.Value = "replace";
+                                if (j== table.Rows.Count-1)
+                                   excelWorkSheet.Cells.Replace("replace", count);
+                                
+                            }
+                            else
+                            {                                                            
+                                excelWorkSheet.Cells.Replace("replace", count);
+                                excelWorkSheet.Cells.Replace("", 1);
+                                //excelWorkSheet.Cells[NoResetCount, 7] =  count;                                                                                                                             
+                                count = 1;
+                            }
+                            
+                            previousValue = table.Rows[j].ItemArray[k].ToString();
+                        }
+                        if (j== table.Rows.Count-1)
+                        {
+                            excelWorkSheet.Cells.Replace("", count);
+                           
+                            Excel.Range finalTotalLeft = excelWorkSheet.Range[excelWorkSheet.Cells[j + 3, 1], excelWorkSheet.Cells[j + 3, 4]];
+                            Excel.Range finalTotalRight = excelWorkSheet.Range[excelWorkSheet.Cells[j + 3, 5], excelWorkSheet.Cells[j + 3, 7]];
+                            finalTotalLeft.Merge(Type.Missing);
+                            finalTotalRight.Merge(Type.Missing);
+                            finalTotalLeft.Value = "Total";
+                            finalTotalRight.Value = j + 1;
+
+                            finalTotalLeft.Style = "NewStyle";
+                            finalTotalRight.Style = "NewStyle";
+                        }
+                        excelWorkSheet.Cells[j + 2, k + 1] = newValue;
+                       
+                    }                   
+                }
+            }
+
+            excelWorkBook.Save();
+            excelWorkBook.Close(true,misValue,misValue);
+            excelApp.Quit();
+            Marshal.ReleaseComObject(excelApp);
+
+            return null;
         }
     }
 }

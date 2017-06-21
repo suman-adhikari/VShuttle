@@ -1,6 +1,27 @@
 ﻿@import url(https://fonts.googleapis.com/css?family=Roboto:300);
 @import url(https://fonts.googleapis.com/css?family=Bubbler+One);
 
+/*seacrh*/
+
+.search{
+    margin-bottom:2px;
+}
+
+.search button{
+    border-radius:0px;
+    width:60px;
+    font-size:11px;
+    background-color:rebeccapurple;
+    color:white;
+    border:none;
+    height:26px;
+    font-family:"Roboto", sans-serif;
+}
+
+.search input{
+   padding:1px;
+}
+
 
 
 /* Route */
@@ -266,7 +287,7 @@ table .btn{
   
 }
 #report {
-  padding-top:70px;
+  padding-top:18px;
 }
 
 /* AjaxGrid */

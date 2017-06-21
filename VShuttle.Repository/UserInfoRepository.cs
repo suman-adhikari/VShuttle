@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace VShuttle.Repository
 {
     public class UserInfoRepository : Repo
     {
-        public AjaxGridResult FindAll(int offset, int rowNumber, string sortExpression, string sortOrder, int pageNumber)
+        public AjaxGridResult FindAll(int offset, int rowNumber, string sortExpression, string sortOrder, int pageNumber, string Name)
         {
             try
             {
@@ -113,6 +114,46 @@ namespace VShuttle.Repository
                 return false;
             }
             return false;
+        }
+
+        public DataSet GetData()
+        {
+            DataSet ds = new DataSet();
+
+            DataTable dt = new DataTable();
+
+            List<UserInfo> userInfo = new List<UserInfo>() {
+                new UserInfo{ Id=1, UserId=1, Name="Abc", Location="Loc1", Total="",   SubLocation="subloc", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc3",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc3",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc3",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc4",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc4",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc7",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=2, UserId=2, Name="Abc1", Location="Loc2",Total="", SubLocation="subloc1", Date="2017/06/12"},
+                new UserInfo{ Id=3, UserId=3, Name="Abc2", Location="Loc2",Total="", SubLocation="subloc2", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc2",Total="", SubLocation="subloc3", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc2",Total="", SubLocation="subloc3", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc5",Total="", SubLocation="subloc3", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc10",Total="", SubLocation="subloc3", Date="2017/06/12"},
+                new UserInfo{ Id=4, UserId=4, Name="Abc3", Location="Loc10",Total="", SubLocation="subloc3", Date="2017/06/12"}
+                
+            };
+
+            dt.Columns.Add("Id");
+            dt.Columns.Add("UserId");
+            dt.Columns.Add("Name");
+            dt.Columns.Add("Location");
+            dt.Columns.Add("Total");
+            dt.Columns.Add("SubLocation");
+            dt.Columns.Add("Date");
+
+            foreach (var item in userInfo)
+            {
+                dt.Rows.Add(item.Id, item.UserId, item.Name, item.Location, item.Total, item.SubLocation,item.Date);
+            }
+            ds.Tables.Add(dt);          
+            return ds;
         }
 
 

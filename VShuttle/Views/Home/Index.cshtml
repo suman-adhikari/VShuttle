@@ -20,22 +20,43 @@
         <span class="form-element col-md-3">          
             @Html.TextBoxFor(m => m.UserInfo.SubLocation, new { placeholder = "Enter Sub-location" })
         </span>
-        <span class="form-element col-md-3 pull-right">
+        <span class="form-element col-md-3">
             <button class="btn btn-primary" type="submit">Save</button>
         </span>
        }
    
 </div>
 
+<div class="clearfix"></div>
+
+<hr>
+
 <div id="report" class="row-fluid">
     
         <div class="col-md-9">
+
+            <div class="row-fluid">
+               
+                 <div class="col-md-offset-3 pull-right search">
+                    
+                     <div class="form-inline">
+                        <input type="text" id="searchName" />
+                        <button id="ajaxgridSearch" >Search</button>
+                        <button id="ajaxgridExport" onclick="location.href='@Url.Action("ExportToExcel","Home")'">Export</button>
+                    </div>
+                    
+                </div>
+
+              
+
+            </div>
+
             <table class="table table-bordered table-responsive table-striped" id="UserInfoList">
                 <thead>
                     <tr>
                         <th><a class="table-header" field-name="Id">Id</a></th>
-                        <th><a class="table-header" field-name="Name">Name</a></th>
-                        <th><a class="table-header" field-name="Location">Location</a></th>
+                        <th class="sorting"><a class="table-header" field-name="Name">Name</a></th>
+                        <th class="sorting"><a class="table-header" field-name="Location">Location</a></th>
                         <th><a class="table-header" field-name="SubLocation">SubLocation</a></th>
                         <th><a class="table-header" field-name="Date">Date</a></th>
                         <th>Actions</th>
@@ -85,8 +106,6 @@
 
     $(function () {
 
-
-
         $('#UserInfoList').ajaxGrid({
             pageSize: 2,
             defaultSortExpression: 'Id',
@@ -106,6 +125,7 @@
                 {
                     control: $('<form action="@Url.Action("Delete","Home")" method="POST" style="display:inline-block">' +
                     '<input type="hidden" name="Id" id="Id"/>' +
+                    '<input type="hidden" name="UserId" id="UserId"/>' +
                     '<button type="submit" class="btn btn-danger" ' +
                     'onclick=\'return confirm("Are you sure you want to Remove this List?")\'>' +
                     '<span class="glyphicon glyphicon-remove"></span></button></form>'),
@@ -114,15 +134,32 @@
                             propertyField: 'input[type=hidden]#Id',
                             property: 'value',
                             propertyValue: 'Id'
+                        },
+                        {
+                            propertyField: 'input[type=hidden]#UserId',
+                            property: 'value',
+                            propertyValue: 'UserId'
                         }
                     ]
                 }
             ],
             afterAjaxCallComplete: function () {
-                //$("#UserInfoList .btn").prop("disabled", true);
+                $("#UserInfoList .btn").prop("disabled", true);
+                $("#UserInfoList #UserId").each(function (k, v) {
+                    if($(this).val() == "@Session["Id"]"){
+                        $(this).closest("tr").find(".btn").prop("disabled",false);
+                    }
+                });
             },
             id: 'Id'
         });
+    });
+   
+    $("#ajaxgridSearch").on('click', function () {
+        
+        var name = $("#searchName").val();
+        $('#UserInfoList').trigger('refreshGrid', { Name: name });
+        $("#searchName").val("");
     });
 
     $('#UserInfoTotal').ajaxGrid({
@@ -133,11 +170,15 @@
         url: '@Url.Action("FindAllTotal","Home")',
         requestType: 'get',
         loadingImage: $('#loading-msg-subscribers-management'),
-        NoRecordsFound: 'No Records Found'
+        NoRecordsFound: 'No Records Found',
+        afterAjaxCallComplete: function () {
+            debugger;
+
+            
+        }
     });
 
     $("#UserInfo_Name").val("@Session["UserName"]");
-    //alert("@Session["UserName"]");
 
 
 </script>

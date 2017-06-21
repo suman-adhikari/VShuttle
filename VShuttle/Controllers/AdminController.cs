@@ -21,9 +21,9 @@ namespace VShuttle.Controllers
             var routes = new List<Routes>()
             {
                 new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur" },
-                new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur" },
-                new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur" },
-                new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur" },
+                new Routes { Id=1, RouteLocations="Office,Koteshwor1,Baneshwor,Bhaktapur" },
+                new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor1,Bhaktapur" },
+                new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur1" },
                 new Routes { Id=1, RouteLocations="Office,Koteshwor,Baneshwor,Bhaktapur" }
             };
 
